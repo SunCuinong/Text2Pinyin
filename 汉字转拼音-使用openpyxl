@@ -1,0 +1,89 @@
+from openpyxl import load_workbook
+from pypinyin import pinyin, lazy_pinyin, Style
+from openpyxl.drawing.image import Image
+import shutil
+import os
+
+#shurutimu
+title="三年级语文第五课"
+# 输入一个长字段，以空格分割
+long_text = "守株 待兔 宋朝 耕田 触动 头颈 释放 其中"
+#long_text = "拼凑 吹拂 赶集 聚拢 形成 横掠 偶尔 沾水 疲倦 闲散"
+
+
+
+
+# 加载现有的Excel文件
+file_dir=os.path.abspath(__file__)
+folder_dir = os.path.dirname(file_dir)
+workbook = load_workbook(f"{folder_dir}/Template.xlsx")
+
+# 选择工作表
+sheet = workbook['Sheet1']
+
+#定义一个函数，将汉字转换为拼音
+def translate_to_pinyin():
+    pinyin_text = ' '.join(lazy_pinyin(item,style=Style.TONE))
+    return pinyin_text
+#定义一个函数，将汉字转换为拼音
+def get_cell_reference(row, col):
+    """
+    Convert row and column number to a cell reference.
+
+    Args:
+    row (int): The row number (1-indexed).
+    col (int): The column number (1-indexed).
+
+    Returns:
+    str: The Excel cell reference as a string.
+    """
+    from openpyxl.utils import get_column_letter
+    return f"{get_column_letter(col)}{row}"
+
+
+# 使用 split() 方法将其分割成数组
+text_array = long_text.split()
+
+# 定义一个换行的阈值（例如，4个元素后换行）
+line_length = 5
+# 初始化计数器
+count = 0
+
+# 初始化行索引
+row_index = 3
+
+sheet["A1"]=title
+# 遍历数组并添加数据到数据框
+for item in text_array:
+    # # 为每次添加创建一个新的图片文件副本
+    # new_image_path = f'temp_image_{item}.png'
+    # shutil.copy('/Users/suncuinong/Desktop/pic.png', new_image_path)
+    # # 创建Image对象（替换为您的图片路径）
+    # img = Image(new_image_path)
+    
+    # 根据计数器确定要添加数据的列
+    column_name = count + 1
+    cell_location = get_cell_reference(row_index, column_name)
+    # img_location = get_cell_reference(row_index+1, column_name)
+    answer_location = get_cell_reference(row_index+23, column_name)
+    sheet[cell_location] = translate_to_pinyin()
+    # sheet.add_image(img, img_location)
+    sheet[answer_location].value = item
+    print(cell_location)
+    print(answer_location)
+
+    
+    count += 1
+
+    # 判断是否需要换行
+    if count >= line_length:
+        count = 0  # 重置计数器
+        row_index += 3  # 换到下一行
+        
+
+
+
+
+
+# 保存文件
+workbook.save(f"{folder_dir}/{title}.xlsx")
