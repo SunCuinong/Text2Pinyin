@@ -2,7 +2,6 @@ from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 import shutil
 import os
-import pdfkit
 
 ########输入部分########
 #定义字典
